@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How the Nikolova–Zimmerman Plasma Tube Detector Works</title>
+  
+  <!-- MathJax for proper physics equation rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --accent: #3b82f6;
+      --accent2: #22d3ee;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --success: #34d399;
+      --border: #2d3a4f;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+      padding: 4rem 1.5rem 3rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(34, 211, 238, 0.1) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(90deg, #60a5fa, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+
+    .hero .subtitle {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      position: relative;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.55rem;
+      color: #93c5fd;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    h2 .num {
+      background: var(--accent);
+      color: white;
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      color: var(--accent2);
+      margin: 1.4rem 0 0.6rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.25rem 0;
+    }
+
+    .card.highlight {
+      border-color: rgba(34, 211, 238, 0.4);
+      background: linear-gradient(145deg, #1a2332, #0f1c2e);
+    }
+
+    .equation {
+      background: #0b1220;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 1.35rem 1.5rem;
+      text-align: center;
+      margin: 1.4rem 0;
+      overflow-x: auto;
+      color: #e0f2fe;
+      font-size: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .equation mjx-container {
+      margin: 0 !important;
+    }
+
+    .key-point {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+      margin: 1rem 0;
+      padding: 0.9rem 1rem;
+      background: rgba(59, 130, 246, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .key-point .icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    ul, ol {
+      margin: 0.8rem 0 1rem 1.5rem;
+      color: #cbd5e1;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .diagram {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .diagram svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .diagram-caption {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 0.8rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 640px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .col-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .col-card h4 {
+      color: var(--accent2);
+      margin-bottom: 0.6rem;
+      font-size: 1.05rem;
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(59, 130, 246, 0.12));
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .summary-box h3 {
+      margin-top: 0;
+      color: #67e8f9;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .ref {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <span class="badge">Vector Potential · Longitudinal Waves · Plasma Antenna</span>
+    <h1>How the Nikolova–Zimmerman<br>Plasma Tube Detector Works</h1>
+    <p class="subtitle">
+      Why a DC-biased fluorescent (or neon) plasma tube can detect an incident 
+      longitudinally polarized vector-potential wave when ordinary metal antennas cannot.
+    </p>
+  </header>
+
+  <main class="container">
+
+    <!-- Question -->
+    <section>
+      <h2><span class="num">Q</span> The Question</h2>
+      <div class="card highlight">
+        <p style="margin:0; font-size:1.1rem;">
+          <strong>How does a biased plasma tube (as used by Nikolova and Zimmerman) act as a receiving antenna for longitudinally polarized momentum / vector-potential waves?</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- Core Idea -->
+    <section>
+      <h2><span class="num">1</span> Core Idea in One Sentence</h2>
+      <div class="card">
+        <p style="font-size:1.15rem; margin-bottom:0;">
+          Free electrons in a low-pressure plasma possess high mobility. An incident longitudinal 
+          magnetic vector potential \(\mathbf{A}_{L}\) couples directly to their kinetic momentum, 
+          modulating the electron drift velocity along the tube axis and producing a detectable RF current.
+        </p>
+      </div>
+    </section>
+
+    <!-- Background -->
+    <section>
+      <h2><span class="num">2</span> Historical &amp; Experimental Context</h2>
+      
+      <p>
+        In 2011 Robert K. Zimmerman (NP4B / VE3RKZ) published in <em>QEX</em> the paper 
+        <em>“Transmission and Reception of Longitudinally-Polarized Momentum Waves.”</em> 
+        Subsequent work with Natalia Nikolova (McMaster University) and Zimmerman’s 2013 
+        <em>Journal of Applied Physics</em> paper refined the plasma-antenna concept.
+      </p>
+
+      <div class="key-point">
+        <span class="icon">📡</span>
+        <div>
+          The detector is typically a U-shaped fluorescent lamp or neon tube operated with a modest DC bias current 
+          (often a few to tens of milliamperes). The tube is oriented so that its long axis lies parallel to the 
+          expected direction of the longitudinal vector potential \(\mathbf{A}_{L}\).
+        </div>
+      </div>
+
+      <p>
+        When a longitudinal wave is present, an RF signal appears on the plasma tube that is not explained by ordinary 
+        transverse electromagnetic (TEM) coupling. A characteristic experimental signature is that reversing the polarity 
+        of the DC bias current reverses the phase of the received RF signal.
+      </p>
+    </section>
+
+    <!-- Physics -->
+    <section>
+      <h2><span class="num">3</span> Why Plasma Electrons Sense the Vector Potential</h2>
+
+      <p>
+        In classical and quantum electrodynamics the mechanical momentum of a charged particle is related to the 
+        canonical momentum by the vector potential:
+      </p>
+
+      <div class="equation">
+        \[ \mathbf{p}_{\text{mech}} = m\mathbf{v} = \mathbf{p}_{\text{can}} - q\mathbf{A} \]
+      </div>
+
+      <p>
+        Consequently an oscillating longitudinal \(\mathbf{A}_{L}\) produces an oscillating contribution to the electron velocity. 
+        Inside a plasma the free-electron density is high and the electrons are only weakly collisional at typical bias pressures, 
+        so the velocity response is comparatively large.
+      </p>
+
+      <div class="key-point">
+        <span class="icon">⚡</span>
+        <div>
+          In metal conductors the electrons are tightly bound to the lattice; the effective RF velocity induced by \(\mathbf{A}\) 
+          is only a few millimetres per second. In a fluorescent-tube plasma the same \(\mathbf{A}\) can produce RF velocity 
+          components of order tens of metres per second — orders of magnitude larger.
+        </div>
+      </div>
+
+      <h3>Orientation Requirement</h3>
+      <p>
+        For a longitudinally polarized wave the vector potential \(\mathbf{A}_{L}\) points along the direction of propagation. 
+        The plasma column must therefore be aligned with that axis so that the \(\mathbf{A}\)-induced velocity perturbation 
+        lies along the tube and modulates the bias current.
+      </p>
+
+      <!-- Orientation SVG Diagram – based on Zimmerman Fig. 4(b) -->
+      <div class="diagram">
+        <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" aria-label="U-shaped plasma tube detector with incident vector potential">
+          <rect width="560" height="300" fill="#0b1220" rx="8"/>
+          
+          <!-- Arrowhead markers -->
+          <defs>
+            <marker id="arrA" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#22d3ee"/>
+            </marker>
+            <marker id="arrVel" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#fbbf24"/>
+            </marker>
+            <marker id="arrDp" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="#f87171"/>
+            </marker>
+          </defs>
+
+          <!-- ===== Incident Vector Potential A (from left) ===== -->
+          <g>
+            <line x1="20" y1="80"  x2="160" y2="80"  stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrA)"/>
+            <line x1="20" y1="110" x2="160" y2="110" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrA)"/>
+            <line x1="20" y1="140" x2="160" y2="140" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrA)"/>
+            <line x1="20" y1="170" x2="160" y2="170" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrA)"/>
+            <line x1="20" y1="200" x2="160" y2="200" stroke="#22d3ee" stroke-width="2.2" marker-end="url(#arrA)"/>
+          </g>
+          <text x="90" y="55" text-anchor="middle" fill="#67e8f9" font-size="13" font-family="sans-serif" font-weight="600">
+            Incident Vector Potential A
+          </text>
+          <text x="90" y="70" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="sans-serif">
+            (longitudinal, oscillating at frequency F)
+          </text>
+
+          <!-- ===== U-shaped Plasma Tube ===== -->
+          <!-- Outer tube outline (thick blue) -->
+          <!-- Top leg -->
+          <rect x="180" y="95" width="220" height="22" rx="11" fill="#1e3a5f" stroke="#60a5fa" stroke-width="3"/>
+          <!-- Bottom leg -->
+          <rect x="180" y="165" width="220" height="22" rx="11" fill="#1e3a5f" stroke="#60a5fa" stroke-width="3"/>
+          <!-- Right bend (semicircle-ish) -->
+          <path d="M 400 106 
+                   Q 445 106 445 141 
+                   Q 445 176 400 176" 
+                fill="none" stroke="#60a5fa" stroke-width="22" stroke-linecap="round"/>
+          <path d="M 400 106 
+                   Q 445 106 445 141 
+                   Q 445 176 400 176" 
+                fill="none" stroke="#1e3a5f" stroke-width="16" stroke-linecap="round"/>
+
+          <!-- Plasma glow inside legs -->
+          <rect x="185" y="100" width="210" height="12" rx="6" fill="#22d3ee" opacity="0.35"/>
+          <rect x="185" y="170" width="210" height="12" rx="6" fill="#22d3ee" opacity="0.35"/>
+
+          <!-- Electron velocity arrows inside top leg (right → left, anti-parallel to A) -->
+          <line x1="360" y1="106" x2="220" y2="106" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrVel)"/>
+          <text x="290" y="92" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="sans-serif">
+            Electron velocity anti-parallel to A
+          </text>
+
+          <!-- Electron velocity arrows inside bottom leg (left → right, parallel to A) -->
+          <line x1="220" y1="176" x2="360" y2="176" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrVel)"/>
+          <text x="290" y="198" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="sans-serif">
+            Electron velocity parallel to A
+          </text>
+
+          <!-- Δp momentum change indicators -->
+          <!-- Top leg: Δp to the left -->
+          <line x1="250" y1="80" x2="210" y2="80" stroke="#f87171" stroke-width="1.8" marker-end="url(#arrDp)"/>
+          <text x="230" y="72" text-anchor="middle" fill="#f87171" font-size="12" font-family="sans-serif" font-weight="600">Δp</text>
+
+          <!-- Bottom leg: Δp to the right -->
+          <line x1="250" y1="210" x2="290" y2="210" stroke="#f87171" stroke-width="1.8" marker-end="url(#arrDp)"/>
+          <text x="270" y="228" text-anchor="middle" fill="#f87171" font-size="12" font-family="sans-serif" font-weight="600">Δp</text>
+
+          <!-- Tube terminals (left open ends) -->
+          <circle cx="180" cy="106" r="8" fill="#0f172a" stroke="#93c5fd" stroke-width="2.5"/>
+          <circle cx="180" cy="176" r="8" fill="#0f172a" stroke="#93c5fd" stroke-width="2.5"/>
+          
+          <!-- Terminal labels -->
+          <text x="155" y="110" text-anchor="end" fill="#93c5fd" font-size="12" font-family="sans-serif">Terminals</text>
+          <text x="155" y="180" text-anchor="end" fill="#93c5fd" font-size="12" font-family="sans-serif">(to 50 Ω)</text>
+
+          <!-- Caption under diagram -->
+          <text x="280" y="265" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif">
+            U-shaped plasma tube acting as differential Aharonov–Bohm detector for longitudinal A
+          </text>
+          <text x="280" y="282" text-anchor="middle" fill="#64748b" font-size="11" font-family="sans-serif">
+            (adapted from Zimmerman, Fig. 4b)
+          </text>
+        </svg>
+        <p class="diagram-caption">
+          Schematic based on Zimmerman’s Fig. 4(b). A longitudinal vector potential \(\mathbf{A}\) arrives from the left. 
+          In the upper leg the electron drift is anti-parallel to \(\mathbf{A}\) and receives a momentum increment \(\Delta p\) to the left; 
+          in the lower leg the drift is parallel to \(\mathbf{A}\) and receives \(\Delta p\) to the right. 
+          The differential momentum appears as an RF current at the tube terminals that can be extracted into a 50 Ω circuit.
+        </p>
+      </div>
+    </section>
+
+    <!-- Detection Mechanism -->
+    <section>
+      <h2><span class="num">4</span> Detection Mechanism</h2>
+
+      <div class="two-col">
+        <div class="col-card">
+          <h4>Velocity Modulation</h4>
+          <p style="margin:0; font-size:0.95rem;">
+            The time-varying longitudinal \(\mathbf{A}_{L}\) adds an oscillating component to the electron velocity. 
+            Because a steady bias current is already flowing, this modulation appears as an RF current superimposed on the DC bias.
+          </p>
+        </div>
+        <div class="col-card">
+          <h4>Phase Reversal Signature</h4>
+          <p style="margin:0; font-size:0.95rem;">
+            Reversing the polarity of the DC bias reverses the average electron drift direction. 
+            Consequently the phase of the received RF signal also reverses — a distinctive experimental marker reported by Zimmerman and Nikolova.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        In the language of the Aharonov–Bohm effect and of the Lorentz force expressed in potentials, 
+        the plasma tube functions as a differential detector of the longitudinal component of \(\mathbf{A}\). 
+        Ordinary metal antennas respond primarily to the transverse electric and magnetic fields; 
+        the plasma’s free electrons give it a unique sensitivity to the potential itself.
+      </p>
+
+      <div class="key-point">
+        <span class="icon">🔍</span>
+        <div>
+          Because the wave under consideration is longitudinal, \(\mathbf{B} = \nabla\times\mathbf{A}_{L} = 0\). 
+          There is therefore no classical magnetic induction to drive currents in a metal loop. 
+          The plasma detector does not rely on \(\mathbf{B}\); it responds directly to \(\mathbf{A}_{L}\).
+        </div>
+      </div>
+    </section>
+
+    <!-- Relation to SLW / EED -->
+    <section>
+      <h2><span class="num">5</span> Relation to Scalar-Longitudinal Waves</h2>
+
+      <p>
+        Within the framework of Extended Electrodynamics (EED) the same longitudinal vector potential 
+        \(\mathbf{A}_{L}\) that appears in the Zimmerman–Nikolova experiments is an integral part of the 
+        scalar-longitudinal wave (SLW). The SLW carries both a longitudinal electric field \(\mathbf{E}_{L}\) 
+        and a dynamical scalar field \(C\), while the magnetic field remains zero.
+      </p>
+
+      <div class="equation">
+        \[ \mathbf{E}_{L} = -\nabla\Phi - \frac{\partial\mathbf{A}_{L}}{\partial t},\qquad 
+           \mathbf{B} = \nabla\times\mathbf{A}_{L} = 0 \]
+      </div>
+
+      <p>
+        The plasma tube therefore serves as a practical laboratory receiver for the same class of waves 
+        that the Hively bifilar coil is designed to detect. The two antennas exploit different physical 
+        mechanisms (gradient-driven current versus electron-velocity modulation by \(\mathbf{A}\)), 
+        yet both are matched to the irrotational sector of the electromagnetic field.
+      </p>
+    </section>
+
+    <!-- Summary -->
+    <section>
+      <h2><span class="num">6</span> Summary</h2>
+      <div class="summary-box">
+        <h3>Key Takeaways</h3>
+        <ul style="margin-top:0.8rem;">
+          <li>A DC-biased plasma tube contains free electrons with high mobility.</li>
+          <li>An incident longitudinal vector potential \(\mathbf{A}_{L}\) couples to the electrons via the canonical-momentum relation, modulating their drift velocity.</li>
+          <li>The tube must be oriented parallel to \(\mathbf{A}_{L}\) (i.e., along the propagation direction of the longitudinal wave).</li>
+          <li>The resulting RF current is extracted from the bias circuit; reversing bias polarity reverses the signal phase.</li>
+          <li>Because \(\mathbf{B}=0\) for a pure longitudinal wave, ordinary inductive antennas are insensitive; the plasma detector is not.</li>
+        </ul>
+        <p class="ref">
+          Primary references: R. K. Zimmerman, <em>QEX</em> July/August 2011; 
+          R. K. Zimmerman, <em>J. Appl. Phys.</em> <strong>114</strong>, 044907 (2013); 
+          related work with N. Nikolova (McMaster University).
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Presentation of the Nikolova–Zimmerman plasma-tube detector for longitudinal vector-potential waves<br>
+    For educational discussion of experimental electrodynamics and SLW concepts
+  </footer>
+
+</body>
+</html>
